@@ -3,85 +3,199 @@
 namespace App\Http\Controllers;
 
 use App\Models\Field;
+use App\Models\PhotoOfField;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class FieldController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Public catalog: list all active fields with search & filter.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $fields = Field::with('owner')->get();
+        $query = Field::with(['owner', 'photos', 'reviews'])->where('status', 'available');
 
-        return response()->json([
-            'data' => $fields,
-        ]);
+        if ($request->filled('search')) {
+            $query->where('field_name', 'like', '%' . $request->search . '%');
+        }
+        if ($request->filled('kota')) {
+            $query->where('location', $request->kota);
+        }
+        if ($request->filled('sport')) {
+            $query->where('sport_category', $request->sport);
+        }
+        if ($request->filled('min_price')) {
+            $query->where('price_per_hour', '>=', $request->min_price);
+        }
+        if ($request->filled('max_price')) {
+            $query->where('price_per_hour', '<=', $request->max_price);
+        }
+
+        $fields = $query->latest()->paginate(12);
+
+        // Get distinct values for filter dropdowns
+        $cities = Field::where('status', 'available')->distinct()->pluck('location');
+        $sports = Field::where('status', 'available')->distinct()->pluck('sport_category');
+
+        return view('fields.index', compact('fields', 'cities', 'sports'));
     }
 
     /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'owner_id' => 'required|exists:owners,id',
-            'field_name' => 'required|string|max:255',
-            'sport_category' => 'required|string|max:255',
-            'price_per_hour' => 'required|numeric|min:0',
-            'status' => 'required|in:available,unavailable',
-        ]);
-
-        $field = Field::create($validated);
-
-        return response()->json([
-            'message' => 'Field created successfully.',
-            'data' => $field->load('owner'),
-        ], 201);
-    }
-
-    /**
-     * Display the specified resource.
+     * Public detail page for a single field.
      */
     public function show(Field $field)
     {
-        $field->load('owner');
+        $field->load(['owner', 'photos', 'schedules', 'reviews.user']);
 
-        return response()->json([
-            'data' => $field,
-        ]);
+        $avgRating = $field->reviews->avg('rating');
+
+        return view('fields.show', compact('field', 'avgRating'));
+    }
+
+    // ─── Owner Management Methods ───
+
+    /**
+     * Owner dashboard: list their own fields.
+     */
+    public function ownerIndex()
+    {
+        $owner = auth()->user()->owner;
+
+        if (!$owner) {
+            return redirect()->route('owner.register')->with('status', 'Silakan daftar sebagai pemilik lapangan terlebih dahulu.');
+        }
+
+        $fields = $owner->fields()->with('photos')->latest()->get();
+
+        return view('owner.fields.index', compact('fields'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Show form for creating a new field.
+     */
+    public function create()
+    {
+        $owner = auth()->user()->owner;
+        if (!$owner) {
+            return redirect()->route('owner.register');
+        }
+
+        return view('owner.fields.create');
+    }
+
+    /**
+     * Store a new field.
+     */
+    public function store(Request $request)
+    {
+        $owner = auth()->user()->owner;
+        if (!$owner) {
+            return redirect()->route('owner.register');
+        }
+
+        $validated = $request->validate([
+            'field_name' => 'required|string|max:255',
+            'sport_category' => 'required|string|max:255',
+            'price_per_hour' => 'required|numeric|min:0',
+            'location' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|in:available,unavailable',
+            'photos.*' => 'nullable|image|max:2048',
+        ]);
+
+        $field = Field::create([
+            'owner_id' => $owner->id,
+            'field_name' => $validated['field_name'],
+            'sport_category' => $validated['sport_category'],
+            'price_per_hour' => $validated['price_per_hour'],
+            'location' => $validated['location'],
+            'description' => $validated['description'] ?? null,
+            'status' => $validated['status'],
+        ]);
+
+        // Handle photo uploads
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                $path = $photo->store('field_photos', 'public');
+                PhotoOfField::create([
+                    'field_id' => $field->id,
+                    'photo_path' => $path,
+                ]);
+            }
+        }
+
+        return redirect()->route('owner.fields.index')->with('status', 'Lapangan berhasil ditambahkan!');
+    }
+
+    /**
+     * Show form for editing a field.
+     */
+    public function edit(Field $field)
+    {
+        $owner = auth()->user()->owner;
+        if (!$owner || $field->owner_id !== $owner->id) {
+            abort(403);
+        }
+
+        $field->load('photos');
+
+        return view('owner.fields.edit', compact('field'));
+    }
+
+    /**
+     * Update a field.
      */
     public function update(Request $request, Field $field)
     {
+        $owner = auth()->user()->owner;
+        if (!$owner || $field->owner_id !== $owner->id) {
+            abort(403);
+        }
+
         $validated = $request->validate([
-            'owner_id' => 'sometimes|required|exists:owners,id',
-            'field_name' => 'sometimes|required|string|max:255',
-            'sport_category' => 'sometimes|required|string|max:255',
-            'price_per_hour' => 'sometimes|required|numeric|min:0',
-            'status' => 'sometimes|required|in:available,unavailable',
+            'field_name' => 'required|string|max:255',
+            'sport_category' => 'required|string|max:255',
+            'price_per_hour' => 'required|numeric|min:0',
+            'location' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'status' => 'required|in:available,unavailable',
+            'photos.*' => 'nullable|image|max:2048',
         ]);
 
         $field->update($validated);
 
-        return response()->json([
-            'message' => 'Field updated successfully.',
-            'data' => $field->load('owner'),
-        ]);
+        // Handle new photo uploads
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                $path = $photo->store('field_photos', 'public');
+                PhotoOfField::create([
+                    'field_id' => $field->id,
+                    'photo_path' => $path,
+                ]);
+            }
+        }
+
+        return redirect()->route('owner.fields.index')->with('status', 'Lapangan berhasil diperbarui!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete a field.
      */
     public function destroy(Field $field)
     {
+        $owner = auth()->user()->owner;
+        if (!$owner || $field->owner_id !== $owner->id) {
+            abort(403);
+        }
+
+        // Delete associated photos from storage
+        foreach ($field->photos as $photo) {
+            Storage::disk('public')->delete($photo->photo_path);
+        }
+
         $field->delete();
 
-        return response()->json([
-            'message' => 'Field deleted successfully.',
-        ]);
+        return redirect()->route('owner.fields.index')->with('status', 'Lapangan berhasil dihapus!');
     }
 }

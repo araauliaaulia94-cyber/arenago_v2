@@ -11,7 +11,7 @@ class OwnerController extends Controller
     {
         // Check if user is already an owner
         if (auth()->user()->owner) {
-            return redirect()->route('dashboard')->with('status', 'Anda sudah terdaftar sebagai pemilik lapangan.');
+            return redirect()->route('owner.fields.index')->with('status', 'Anda sudah terdaftar sebagai pemilik lapangan.');
         }
 
         return view('owner.register');
@@ -43,6 +43,6 @@ class OwnerController extends Controller
             'status_verifikasi' => 'diterima', // Auto-accept for development mode based on PRD
         ]);
 
-        return redirect()->route('dashboard')->with('status', 'Pendaftaran pemilik lapangan berhasil!');
+        return redirect()->route('owner.fields.index')->with('status', 'Pendaftaran pemilik lapangan berhasil! Selanjutnya tambahkan lapangan Anda.');
     }
 }

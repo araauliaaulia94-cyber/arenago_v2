@@ -12,6 +12,7 @@ class Booking extends Model
     protected $fillable = [
         'user_id',
         'schedule_id',
+        'booking_date',
         'total_price',
         'status',
     ];
@@ -19,6 +20,7 @@ class Booking extends Model
     protected function casts(): array
     {
         return [
+            'booking_date' => 'date',
             'total_price' => 'decimal:2',
         ];
     }

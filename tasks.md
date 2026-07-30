@@ -7,6 +7,10 @@ Status Legend:
 - `[/]` **In Progress**: Sedang dalam proses pengerjaan.
 - `[ ]` **Pending**: Direncanakan / belum dikerjakan.
 
+## 🎨 UI Consistency Rule
+
+Semua halaman baru atau halaman yang dirombak harus mengikuti **Design System & Pola Halaman ArenaGo** pada bagian 9 di `prd_arenago.md`. Acuan implementasi saat ini adalah `resources/views/owner/fields/create.blade.php`: header kontekstual, card section bernomor, upload dengan feedback/pratinjau, istilah status yang ramah pengguna, CTA spesifik, serta layout mobile-first. Tambahkan pemeriksaan pola UI ini pada setiap task halaman sebelum statusnya ditandai selesai.
+
 ---
 
 ## 📌 Phase 1: Foundations, Database & Core Auth
@@ -40,19 +44,23 @@ Status Legend:
 
 ## 📌 Phase 2: Venue Management & Slot Booking System
 
-- [ ] **Dashboard & Manajemen Venue (Owner)**:
-  - [ ] Form Tambah & Edit Lapangan (`FieldController@store`, `@update`).
-  - [ ] Unggah Galeri Foto Lapangan (`PhotoOfFieldController`).
-  - [ ] Pengaturan Jam Operasional & Slot Waktu Lapangan (`ScheduleController`).
-  - [ ] Dashboard Pesanan Masuk (Lihat & konfirmasi booking penyewa).
-- [ ] **Eksplorasi & Pemesanan Lapangan (Penyewa)**:
-  - [ ] Halaman Katalog Lapangan (Pencarian & Filter berdasarkan Kota, Kategori Olahraga, Rentang Harga).
-  - [ ] Halaman Detail Lapangan (Info, Fasilitas, Foto, Lokasi, Rating, & Slot Jam Real-Time).
-  - [ ] Form Booking Slot (Pilih Tanggal & Jam, Hitung Total Bayar).
-- [ ] **Sistem Pembayaran & Konfirmasi**:
-  - [ ] Halaman Instruksi Pembayaran & Form Unggah Bukti Bayar.
-  - [ ] Verifikasi Pembayaran oleh Owner/Admin (Ubah status booking menjadi Paid).
-  - [ ] Halaman "Pesanan Saya" (*My Bookings*) untuk penyewa.
+**Konteks implementasi (30 Juli 2026):** Fase ini sedang diselesaikan di working tree. Schema telah dilengkapi dengan `fields.location`, `fields.description`, dan `bookings.booking_date`. Slot adalah template berulang per hari; booking memilih tanggal nyata yang harus sesuai dengan hari slot. Constraint unik `schedule_id + booking_date` mencegah double-booking pada level database. Validasi otomatis penuh masih tertahan karena PHP environment belum memiliki driver SQLite yang dipakai oleh test suite.
+
+**Panduan uji manual:** lihat `testing_phase2.md`. Skenario tersebut dimulai dari database kosong dan registrasi pada `/register`, lalu menguji alur owner, penyewa, pembayaran, validasi, dan otorisasi.
+
+- [/] **Dashboard & Manajemen Venue (Owner)**:
+  - [x] Form Tambah & Edit Lapangan (`FieldController@store`, `@update`) — divalidasi manual: pembuatan, edit, status publikasi, dan redirect owner berfungsi. UI sudah mengikuti Design System ArenaGo.
+  - [x] Unggah Galeri Foto Lapangan (diintegrasikan ke `FieldController`, bukan controller terpisah) — mendukung multi-upload, pratinjau sebelum simpan, serta ganti/hapus foto per-item.
+  - [x] Pengaturan Jam Operasional & Slot Waktu Lapangan (`ScheduleController`) — diuji manual di PostgreSQL; pengurutan hari, tambah, hapus, dan otorisasi kepemilikan berfungsi.
+  - [/] Dashboard Pesanan Masuk (Lihat & konfirmasi booking penyewa) — konfirmasi mengubah booking dan payment secara atomik; menunggu feature test.
+- [/] **Eksplorasi & Pemesanan Lapangan (Penyewa)**:
+  - [/] Halaman Katalog Lapangan (Pencarian & Filter berdasarkan Kota, Kategori Olahraga, Rentang Harga) — tersedia untuk field `available`; menunggu feature test.
+  - [/] Halaman Detail Lapangan (Info, Fasilitas, Foto, Lokasi, Rating, & Slot Jam) — tersedia; indikator ketersediaan per tanggal akan diperkuat pada iterasi UI berikutnya.
+  - [/] Form Booking Slot (Pilih Tanggal & Jam, Hitung Total Bayar) — tanggal dan kecocokan hari divalidasi; unique constraint mencegah double-booking; menunggu feature test.
+- [/] **Sistem Pembayaran & Konfirmasi**:
+  - [/] Halaman Instruksi Pembayaran & Form Unggah Bukti Bayar — tersedia untuk transfer bank, QRIS, dan e-wallet; menunggu feature test.
+  - [/] Verifikasi Pembayaran oleh Owner/Admin (Ubah status booking menjadi Paid) — payment `successful`, `paid_at`, dan booking `paid` diperbarui bersama; menunggu feature test.
+  - [/] Halaman "Pesanan Saya" (*My Bookings*) untuk penyewa — daftar dan halaman detail tersedia; menunggu feature test.
 
 ---
 
@@ -91,6 +99,6 @@ Status Legend:
 ## 📊 Project Progress Summary
 
 - **Total Main Tasks**: 40
-- **Completed**: 26
-- **In Progress**: 0
-- **Pending**: 14
+- **Completed**: 29 (26 fondasi + 3 subfitur owner Fase 2 yang telah diuji manual)
+- **In Progress**: 7 (sisa subfitur Fase 2; implementasi tersedia tetapi belum seluruhnya diverifikasi end-to-end)
+- **Pending**: 14 (Fase 3 dan Fase 4)

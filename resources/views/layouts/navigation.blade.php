@@ -17,7 +17,7 @@
                     </x-nav-link>
 
                     @if(Auth::user()->owner)
-                        <x-nav-link href="#" :active="false">
+                        <x-nav-link :href="route('owner.fields.index')" :active="request()->routeIs('owner.*')">
                             {{ __('Dashboard Pemilik') }}
                         </x-nav-link>
                     @else
@@ -82,7 +82,7 @@
             </x-responsive-nav-link>
 
             @if(Auth::user()->owner)
-                <x-responsive-nav-link href="#" :active="false">
+                <x-responsive-nav-link :href="route('owner.fields.index')" :active="request()->routeIs('owner.*')">
                     {{ __('Dashboard Pemilik') }}
                 </x-responsive-nav-link>
             @else

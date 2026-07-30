@@ -173,3 +173,71 @@ sequenceDiagram
 - **Fase 2 (Venue & Booking)**: Manajemen Lapangan Owner, Slot Jadwal, Booking & Pembayaran.
 - **Fase 3 (Sparring Matchmaking)**: Modul Sparring Post, Pencarian Lokasi, Sparring Invites & Members.
 - **Fase 4 (Engagement & Gamification)**: Review, Favorites, Achievements, Activity History, & Notifications.
+
+---
+
+## 8. Catatan Implementasi Fase 2 (30 Juli 2026)
+
+Bagian ini menjelaskan keputusan teknis agar implementasi venue dan booking dapat dipahami saat dilanjutkan.
+
+### Data lapangan dan status
+- `fields` menyimpan `location` dan `description` selain nama, kategori, harga, dan pemilik.
+- Status lapangan konsisten dengan skema database: `available` atau `unavailable`. Hanya lapangan `available` yang ditampilkan di katalog dan dapat dipesan.
+- Foto galeri disimpan pada `photo_of_fields`; berkas fisik memakai disk Laravel `public` di folder `field_photos`.
+
+### Slot dan booking
+- `schedules` adalah template jam operasional berulang per hari (`Monday` sampai `Sunday`), bukan jadwal reservasi per tanggal.
+- Saat booking, penyewa wajib memilih `booking_date` masa kini atau masa depan. Server memvalidasi hari dari tanggal tersebut sesuai dengan hari pada slot.
+- Satu slot hanya dapat dipesan sekali pada satu tanggal. Unique constraint `schedule_id + booking_date` menjaga integritas, termasuk pada permintaan bersamaan (*race condition*).
+- Harga booking adalah salinan `fields.price_per_hour` pada `bookings.total_price`, agar perubahan harga tidak mengubah transaksi historis.
+
+### Pembayaran dan peran
+- Penyewa membuat booking `pending`, memilih `bank_transfer`, `qris`, atau `e_wallet`, lalu mengunggah bukti gambar maksimal 2 MB.
+- Satu booking hanya boleh memiliki satu payment record. Owner lapangan terkait yang dapat melihat bukti dan mengonfirmasi.
+- Konfirmasi menjalankan transaksi database: `payments.status` menjadi `successful`, `paid_at` terisi, dan `bookings.status` menjadi `paid` secara atomik.
+- Notifikasi database dibuat ketika booking/bukti pembayaran masuk dan setelah pembayaran dikonfirmasi. UI notifikasi penuh tetap pekerjaan Fase 4.
+
+### Kriteria penerimaan Fase 2
+1. Owner hanya dapat mengelola lapangan dan slot miliknya sendiri.
+2. Penyewa dapat mencari lapangan, melihat detail serta slot, lalu membuat booking dengan tanggal valid.
+3. Booking dengan tanggal yang tidak cocok dengan hari slot atau slot yang sudah terambil harus ditolak.
+4. Penyewa dapat melihat detail pesanan dan mengunggah satu bukti pembayaran.
+5. Owner hanya dapat mengonfirmasi payment dari lapangannya.
+
+---
+
+## 9. Design System & Pola Halaman ArenaGo
+
+Pola ini ditetapkan dari redesign halaman **Tambah Lapangan** dan menjadi acuan untuk seluruh halaman baru atau halaman yang diperbarui. Tujuannya adalah menjaga tampilan ArenaGo modern, mudah dipindai, dan konsisten di desktop maupun mobile.
+
+### Arah visual
+- **Karakter:** modern sport-booking; percaya diri, aktif, dan ramah.
+- **Warna utama:** indigo untuk aksi utama, navigasi, dan informasi; lime dipakai hemat sebagai aksen sukses atau highlight; abu-abu netral untuk latar dan teks pendukung.
+- **Tipografi:** Figtree dengan judul tegas, deskripsi ringkas, dan teks bantu yang mudah dipindai.
+- **Bentuk:** card dengan sudut `rounded-xl` atau `rounded-2xl`, border tipis, dan bayangan halus. Hindari panel kotak default tanpa hirarki.
+
+### Struktur halaman formulir
+1. **Header kontekstual**: eyebrow/label kecil, judul halaman, deskripsi atau tombol kembali.
+2. **Banner orientasi**: jelaskan tujuan atau langkah berikutnya hanya bila form memiliki beberapa tahap.
+3. **Section card**: kelompokkan field menurut tujuan, beri nomor, judul, dan deskripsi singkat. Jangan menyajikan satu form panjang tanpa pengelompokan.
+4. **Aksi akhir jelas**: tombol primer memakai kata kerja spesifik, misalnya `Simpan dan atur jadwal`; tombol batal bersifat sekunder.
+5. **Mobile-first**: satu kolom di layar kecil; grid atau sidebar hanya aktif pada layar besar.
+
+### Form, upload, dan feedback
+- Label selalu berada di atas input dan menggunakan bahasa tindakan yang jelas.
+- Placeholder memberi contoh data realistis, bukan teks generik.
+- Validasi tampil tepat di bawah field terkait memakai komponen error Laravel yang ada.
+- Upload file memakai dropzone/area klik yang menjelaskan tipe, batas ukuran, dan aksi pengguna.
+- Upload multi-foto wajib memberi jumlah dan pratinjau file sebelum submit.
+- Pengelolaan aset yang sudah tersimpan harus per-item: pengguna dapat mengganti atau menghapus satu foto tanpa memengaruhi foto lain.
+- Status harus memakai istilah domain yang ramah pengguna (`Tersedia`, `Tidak tersedia`), bukan nilai teknis database.
+
+### Ringkasan dan pratinjau
+- Form owner yang berdampak ke katalog sebaiknya memiliki ringkasan/pratinjau live pada desktop.
+- Pratinjau memuat informasi paling penting bagi pengguna akhir: nama, kategori, lokasi, harga, status, dan media utama.
+- Sidebar pratinjau bersifat pelengkap; seluruh fungsi utama harus tetap dapat diselesaikan pada mobile tanpa sidebar.
+
+### Penerapan
+- Halaman acuan: `resources/views/owner/fields/create.blade.php`.
+- Sebelum membuat atau merombak halaman, bandingkan dengan pola ini terlebih dahulu.
+- Bila sebuah halaman menyimpang karena kebutuhan khusus, alasan dan pola penggantinya harus dicatat di PRD atau task terkait.
