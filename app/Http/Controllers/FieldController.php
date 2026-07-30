@@ -32,7 +32,7 @@ class FieldController extends Controller
             $query->where('price_per_hour', '<=', $request->max_price);
         }
 
-        $fields = $query->latest()->paginate(12);
+        $fields = $query->latest()->paginate(12)->withQueryString();
 
         // Get distinct values for filter dropdowns
         $cities = Field::where('status', 'available')->distinct()->pluck('location');
@@ -46,7 +46,23 @@ class FieldController extends Controller
      */
     public function show(Field $field)
     {
-        $field->load(['owner', 'photos', 'schedules', 'reviews.user']);
+        $field->load([
+            'owner',
+            'photos',
+            'schedules' => fn ($query) => $query
+                ->orderByRaw("CASE day
+                    WHEN 'Monday' THEN 1
+                    WHEN 'Tuesday' THEN 2
+                    WHEN 'Wednesday' THEN 3
+                    WHEN 'Thursday' THEN 4
+                    WHEN 'Friday' THEN 5
+                    WHEN 'Saturday' THEN 6
+                    WHEN 'Sunday' THEN 7
+                    ELSE 8
+                END")
+                ->orderBy('start_time'),
+            'reviews.user',
+        ]);
 
         $avgRating = $field->reviews->avg('rating');
 

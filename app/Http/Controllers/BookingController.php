@@ -19,7 +19,7 @@ class BookingController extends Controller
     public function index()
     {
         $bookings = auth()->user()->bookings()
-            ->with(['schedule.field.owner', 'payment'])
+            ->with(['schedule.field.owner', 'schedule.field.photos', 'payment'])
             ->latest()
             ->get();
 
