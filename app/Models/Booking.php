@@ -38,4 +38,9 @@ class Booking extends Model
     {
         return $this->belongsTo(Schedule::class);
     }
+
+    public function payment()
+    {
+        return $this->hasOne(Payment::class);
+    }
 }

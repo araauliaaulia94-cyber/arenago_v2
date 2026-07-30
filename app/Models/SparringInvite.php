@@ -11,19 +11,11 @@ class SparringInvite extends Model
 
     protected $fillable = [
         'sparring_post_id',
-        'sender_id',
-        'receiver_id',
-        'status',
+        'sender_user_id',
+        'team_name',
         'message',
-        'responded_at',
+        'status',
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'responded_at' => 'datetime',
-        ];
-    }
 
     /**
      * The related sparring post.
@@ -38,14 +30,6 @@ class SparringInvite extends Model
      */
     public function sender()
     {
-        return $this->belongsTo(User::class, 'sender_id');
-    }
-
-    /**
-     * User who received the invitation.
-     */
-    public function receiver()
-    {
-        return $this->belongsTo(User::class, 'receiver_id');
+        return $this->belongsTo(User::class, 'sender_user_id');
     }
 }

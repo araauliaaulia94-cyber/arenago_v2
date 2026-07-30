@@ -18,6 +18,8 @@ class Field extends Model
         'field_name',
         'sport_category',
         'price_per_hour',
+        'location',
+        'description',
         'status',
     ];
 
@@ -27,5 +29,20 @@ class Field extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(Owner::class);
+    }
+
+    public function photos()
+    {
+        return $this->hasMany(PhotoOfField::class);
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
     }
 }

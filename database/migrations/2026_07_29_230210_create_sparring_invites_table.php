@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('sparring_invites', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('sparring_post_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('sender_user_id')->constrained('users')->cascadeOnDelete();
+            $table->string('team_name');
+            $table->text('message')->nullable();
+            $table->enum('status', ['pending', 'accepted', 'rejected'])->default('pending');
             $table->timestamps();
         });
     }

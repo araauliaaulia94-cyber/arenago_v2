@@ -13,6 +13,18 @@ return new class extends Migration
     {
         Schema::create('sparring_posts', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('title');
+            $table->string('sport_category');
+            $table->string('location');
+            $table->foreignId('field_id')->nullable()->constrained()->nullOnDelete();
+            $table->date('event_date');
+            $table->time('start_time');
+            $table->time('end_time');
+            $table->string('team_name');
+            $table->string('cost')->nullable();
+            $table->string('contact')->nullable();
+            $table->enum('status', ['open', 'matched', 'completed', 'cancelled'])->default('open');
             $table->timestamps();
         });
     }
