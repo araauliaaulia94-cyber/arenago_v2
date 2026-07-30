@@ -15,6 +15,16 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+
+                    @if(Auth::user()->owner)
+                        <x-nav-link href="#" :active="false">
+                            {{ __('Dashboard Pemilik') }}
+                        </x-nav-link>
+                    @else
+                        <x-nav-link :href="route('owner.register')" :active="request()->routeIs('owner.register')">
+                            {{ __('Daftar Jadi Pemilik') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -70,6 +80,16 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            @if(Auth::user()->owner)
+                <x-responsive-nav-link href="#" :active="false">
+                    {{ __('Dashboard Pemilik') }}
+                </x-responsive-nav-link>
+            @else
+                <x-responsive-nav-link :href="route('owner.register')" :active="request()->routeIs('owner.register')">
+                    {{ __('Daftar Jadi Pemilik') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

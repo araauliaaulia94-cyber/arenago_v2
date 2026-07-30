@@ -7,81 +7,42 @@ use Illuminate\Http\Request;
 
 class OwnerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function create()
     {
-        $owners = Owner::with('user')->get();
+        // Check if user is already an owner
+        if (auth()->user()->owner) {
+            return redirect()->route('dashboard')->with('status', 'Anda sudah terdaftar sebagai pemilik lapangan.');
+        }
 
-        return response()->json([
-            'data' => $owners,
-        ]);
+        return view('owner.register');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
+        // Check if user is already an owner
+        if (auth()->user()->owner) {
+            return redirect()->route('dashboard')->with('status', 'Anda sudah terdaftar sebagai pemilik lapangan.');
+        }
+
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
             'nama_usaha' => 'required|string|max:255',
             'kota' => 'required|string|max:255',
-            'foto_usaha' => 'nullable|string|max:255',
-            'status_verifikasi' => 'required|in:pending,diterima,ditolak',
+            'foto_usaha' => 'nullable|image|max:2048', // 2MB max
         ]);
 
-        $owner = Owner::create($validated);
+        $path = null;
+        if ($request->hasFile('foto_usaha')) {
+            $path = $request->file('foto_usaha')->store('owner_photos', 'public');
+        }
 
-        return response()->json([
-            'message' => 'Owner created successfully.',
-            'data' => $owner->load('user'),
-        ], 201);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Owner $owner)
-    {
-        $owner->load('user');
-
-        return response()->json([
-            'data' => $owner,
-        ]);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Owner $owner)
-    {
-        $validated = $request->validate([
-            'user_id' => 'sometimes|required|exists:users,id',
-            'nama_usaha' => 'sometimes|required|string|max:255',
-            'kota' => 'sometimes|required|string|max:255',
-            'foto_usaha' => 'nullable|string|max:255',
-            'status_verifikasi' => 'sometimes|required|in:pending,diterima,ditolak',
+        $owner = Owner::create([
+            'user_id' => auth()->id(),
+            'nama_usaha' => $validated['nama_usaha'],
+            'kota' => $validated['kota'],
+            'foto_usaha' => $path,
+            'status_verifikasi' => 'diterima', // Auto-accept for development mode based on PRD
         ]);
 
-        $owner->update($validated);
-
-        return response()->json([
-            'message' => 'Owner updated successfully.',
-            'data' => $owner->load('user'),
-        ]);
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Owner $owner)
-    {
-        $owner->delete();
-
-        return response()->json([
-            'message' => 'Owner deleted successfully.',
-        ]);
+        return redirect()->route('dashboard')->with('status', 'Pendaftaran pemilik lapangan berhasil!');
     }
 }

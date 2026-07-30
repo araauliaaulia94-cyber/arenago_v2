@@ -32,9 +32,9 @@ Status Legend:
   - [x] Hubungkan `Field` dengan `Owner`, `PhotoOfField`, `Schedule`, `Review`.
   - [x] Hubungkan `Booking` dengan `User`, `Schedule`, `Payment`.
   - [x] Hubungkan `SparringPost` dengan `User`, `SparringMember`, `SparringInvite`.
-- [ ] **Dual-Role User Profile**:
-  - [ ] Form Pendaftaran Akun Pemilik Lapangan (*Owner Registration*).
-  - [ ] Navigasi kondisional (Beralih tampilan antara Penyewa & Pemilik Lapangan).
+- [x] **Dual-Role User Profile**:
+  - [x] Form Pendaftaran Akun Pemilik Lapangan (*Owner Registration*).
+  - [x] Navigasi kondisional (Beralih tampilan antara Penyewa & Pemilik Lapangan).
 
 ---
 
@@ -91,6 +91,6 @@ Status Legend:
 ## 📊 Project Progress Summary
 
 - **Total Main Tasks**: 40
-- **Completed**: 24
+- **Completed**: 26
 - **In Progress**: 0
-- **Pending**: 16
+- **Pending**: 14
