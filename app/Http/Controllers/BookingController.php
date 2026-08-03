@@ -92,7 +92,7 @@ class BookingController extends Controller
             abort(403);
         }
 
-        $booking->load(['schedule.field.owner', 'payment']);
+        $booking->load(['schedule.field.owner', 'schedule.field.photos', 'payment']);
 
         return view('bookings.show', compact('booking'));
     }

@@ -52,7 +52,7 @@ Semua halaman baru atau halaman yang dirombak harus mengikuti **Design System & 
   - [x] Form Tambah & Edit Lapangan (`FieldController@store`, `@update`) — divalidasi manual: pembuatan, edit, status publikasi, dan redirect owner berfungsi. UI sudah mengikuti Design System ArenaGo.
   - [x] Unggah Galeri Foto Lapangan (diintegrasikan ke `FieldController`, bukan controller terpisah) — mendukung multi-upload, pratinjau sebelum simpan, serta ganti/hapus foto per-item.
   - [x] Pengaturan Jam Operasional & Slot Waktu Lapangan (`ScheduleController`) — diuji manual di PostgreSQL; pengurutan hari, tambah, hapus, dan otorisasi kepemilikan berfungsi.
-  - [/] Dashboard Pesanan Masuk (Lihat & konfirmasi booking penyewa) — konfirmasi mengubah booking dan payment secara atomik; menunggu feature test.
+  - [/] Dashboard Pesanan Masuk (Lihat & konfirmasi booking penyewa) — konfirmasi mengubah booking dan payment secara atomik; UI sudah dirombak mengikuti Design System (header kontekstual, banner ringkasan, stat card, daftar pesanan card-based mobile-first, status ramah pengguna, CTA konfirmasi spesifik, sticky aside); menunggu feature test.
 - [/] **Eksplorasi & Pemesanan Lapangan (Penyewa)**:
   - [/] Halaman Katalog Lapangan (Pencarian & Filter berdasarkan Kota, Kategori Olahraga, Rentang Harga) — tersedia untuk field `available`; menunggu feature test.
   - [/] Halaman Detail Lapangan (Info, Fasilitas, Foto, Lokasi, Rating, & Slot Jam) — tersedia; indikator ketersediaan per tanggal akan diperkuat pada iterasi UI berikutnya.
@@ -60,7 +60,7 @@ Semua halaman baru atau halaman yang dirombak harus mengikuti **Design System & 
 - [/] **Sistem Pembayaran & Konfirmasi**:
   - [/] Halaman Instruksi Pembayaran & Form Unggah Bukti Bayar — tersedia untuk transfer bank, QRIS, dan e-wallet; menunggu feature test.
   - [/] Verifikasi Pembayaran oleh Owner/Admin (Ubah status booking menjadi Paid) — payment `successful`, `paid_at`, dan booking `paid` diperbarui bersama; menunggu feature test.
-  - [/] Halaman "Pesanan Saya" (*My Bookings*) untuk penyewa — daftar dan halaman detail tersedia; menunggu feature test.
+  - [/] Halaman "Pesanan Saya" (*My Bookings*) untuk penyewa — daftar dan halaman detail tersedia; halaman detail sudah dirombak mengikuti Design System (header kontekstual, banner intro, card section bernomor, status ramah pengguna, CTA spesifik, sticky aside); menunggu feature test.
 
 ---
 
