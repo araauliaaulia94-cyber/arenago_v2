@@ -13,10 +13,7 @@ class ScheduleController extends Controller
      */
     public function index(Field $field)
     {
-        $owner = auth()->user()->owner;
-        if (!$owner || $field->owner_id !== $owner->id) {
-            abort(403);
-        }
+        $this->authorize('manage', $field);
 
         $schedules = $field->schedules()
             ->orderByRaw("CASE day
@@ -40,16 +37,29 @@ class ScheduleController extends Controller
      */
     public function store(Request $request, Field $field)
     {
-        $owner = auth()->user()->owner;
-        if (!$owner || $field->owner_id !== $owner->id) {
-            abort(403);
-        }
+        $this->authorize('manage', $field);
 
         $validated = $request->validate([
             'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
             'start_time' => 'required|date_format:H:i',
             'end_time' => 'required|date_format:H:i|after:start_time',
         ]);
+
+        $overlap = $field->schedules()
+            ->where('day', $validated['day'])
+            ->where(function ($query) use ($validated) {
+                $query->whereBetween('start_time', [$validated['start_time'], $validated['end_time']])
+                    ->orWhereBetween('end_time', [$validated['start_time'], $validated['end_time']])
+                    ->orWhere(function ($query) use ($validated) {
+                        $query->where('start_time', '<', $validated['start_time'])
+                            ->where('end_time', '>', $validated['end_time']);
+                    });
+            })
+            ->exists();
+
+        if ($overlap) {
+            return back()->withInput()->withErrors(['start_time' => 'Slot ini tumpang tindih dengan slot yang sudah ada pada hari ' . $validated['day'] . '.']);
+        }
 
         $field->schedules()->create($validated);
 
@@ -61,10 +71,7 @@ class ScheduleController extends Controller
      */
     public function destroy(Field $field, Schedule $schedule)
     {
-        $owner = auth()->user()->owner;
-        if (!$owner || $field->owner_id !== $owner->id) {
-            abort(403);
-        }
+        $this->authorize('manage', $schedule);
 
         if ($schedule->field_id !== $field->id) {
             abort(404);

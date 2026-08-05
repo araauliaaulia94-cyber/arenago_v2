@@ -76,13 +76,7 @@ class FieldController extends Controller
      */
     public function ownerIndex()
     {
-        $owner = auth()->user()->owner;
-
-        if (!$owner) {
-            return redirect()->route('owner.register')->with('status', 'Silakan daftar sebagai pemilik lapangan terlebih dahulu.');
-        }
-
-        $fields = $owner->fields()->with('photos')->latest()->get();
+        $fields = auth()->user()->owner->fields()->with('photos')->latest()->get();
 
         return view('owner.fields.index', compact('fields'));
     }
@@ -92,11 +86,6 @@ class FieldController extends Controller
      */
     public function create()
     {
-        $owner = auth()->user()->owner;
-        if (!$owner) {
-            return redirect()->route('owner.register');
-        }
-
         return view('owner.fields.create');
     }
 
@@ -105,11 +94,6 @@ class FieldController extends Controller
      */
     public function store(Request $request)
     {
-        $owner = auth()->user()->owner;
-        if (!$owner) {
-            return redirect()->route('owner.register');
-        }
-
         $validated = $request->validate([
             'field_name' => 'required|string|max:255',
             'sport_category' => 'required|string|max:255',
@@ -121,7 +105,7 @@ class FieldController extends Controller
         ]);
 
         $field = Field::create([
-            'owner_id' => $owner->id,
+            'owner_id' => auth()->user()->owner->id,
             'field_name' => $validated['field_name'],
             'sport_category' => $validated['sport_category'],
             'price_per_hour' => $validated['price_per_hour'],
@@ -149,10 +133,7 @@ class FieldController extends Controller
      */
     public function edit(Field $field)
     {
-        $owner = auth()->user()->owner;
-        if (!$owner || $field->owner_id !== $owner->id) {
-            abort(403);
-        }
+        $this->authorize('manage', $field);
 
         $field->load('photos');
 
@@ -164,10 +145,7 @@ class FieldController extends Controller
      */
     public function update(Request $request, Field $field)
     {
-        $owner = auth()->user()->owner;
-        if (!$owner || $field->owner_id !== $owner->id) {
-            abort(403);
-        }
+        $this->authorize('manage', $field);
 
         $validated = $request->validate([
             'field_name' => 'required|string|max:255',
@@ -200,10 +178,7 @@ class FieldController extends Controller
      */
     public function destroy(Field $field)
     {
-        $owner = auth()->user()->owner;
-        if (!$owner || $field->owner_id !== $owner->id) {
-            abort(403);
-        }
+        $this->authorize('manage', $field);
 
         // Delete associated photos from storage
         foreach ($field->photos as $photo) {

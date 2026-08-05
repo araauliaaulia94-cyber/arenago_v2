@@ -9,7 +9,6 @@ class OwnerController extends Controller
 {
     public function create()
     {
-        // Check if user is already an owner
         if (auth()->user()->owner) {
             return redirect()->route('owner.fields.index')->with('status', 'Anda sudah terdaftar sebagai pemilik lapangan.');
         }
@@ -19,7 +18,6 @@ class OwnerController extends Controller
 
     public function store(Request $request)
     {
-        // Check if user is already an owner
         if (auth()->user()->owner) {
             return redirect()->route('dashboard')->with('status', 'Anda sudah terdaftar sebagai pemilik lapangan.');
         }
@@ -27,7 +25,9 @@ class OwnerController extends Controller
         $validated = $request->validate([
             'nama_usaha' => 'required|string|max:255',
             'kota' => 'required|string|max:255',
-            'foto_usaha' => 'nullable|image|max:2048', // 2MB max
+            'alamat_lengkap' => 'required|string|max:500',
+            'rekening_bank' => 'nullable|string|max:100',
+            'foto_usaha' => 'nullable|image|max:2048',
         ]);
 
         $path = null;
@@ -35,12 +35,14 @@ class OwnerController extends Controller
             $path = $request->file('foto_usaha')->store('owner_photos', 'public');
         }
 
-        $owner = Owner::create([
+        Owner::create([
             'user_id' => auth()->id(),
             'nama_usaha' => $validated['nama_usaha'],
             'kota' => $validated['kota'],
+            'alamat_lengkap' => $validated['alamat_lengkap'],
+            'rekening_bank' => $validated['rekening_bank'] ?? null,
             'foto_usaha' => $path,
-            'status_verifikasi' => 'diterima', // Auto-accept for development mode based on PRD
+            'status_verifikasi' => 'diterima',
         ]);
 
         return redirect()->route('owner.fields.index')->with('status', 'Pendaftaran pemilik lapangan berhasil! Selanjutnya tambahkan lapangan Anda.');

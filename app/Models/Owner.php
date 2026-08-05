@@ -13,6 +13,8 @@ class Owner extends Model
         'user_id',
         'nama_usaha',
         'kota',
+        'alamat_lengkap',
+        'rekening_bank',
         'foto_usaha',
         'status_verifikasi',
     ];

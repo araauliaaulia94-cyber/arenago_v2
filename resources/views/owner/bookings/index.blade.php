@@ -28,6 +28,9 @@
         })->values();
 
         $statusBadge = function ($booking) {
+            if ($booking->status === 'completed') {
+                return ['label' => 'Selesai', 'class' => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/50 dark:text-indigo-300'];
+            }
             if ($booking->status === 'paid') {
                 return ['label' => 'Lunas', 'class' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300'];
             }
@@ -189,8 +192,25 @@
                                                     </button>
                                                 </form>
                                             @elseif($booking->status === 'paid')
-                                                <div class="mt-4 flex items-center gap-2 rounded-lg bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">
-                                                    <span aria-hidden="true">&#10003;</span> Pembayaran lunas &mdash; pesanan siap dimainkan.
+                                                <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+                                                    <div class="flex flex-1 items-center gap-2 rounded-lg bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300">
+                                                        <span aria-hidden="true">&#10003;</span> Pembayaran lunas &mdash; siap dimainkan.
+                                                    </div>
+                                                    <form method="POST" action="{{ route('owner.bookings.complete', $booking) }}" onsubmit="return confirm('Tandai pesanan {{ $booking->user->name }} sebagai selesai?')">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-lg border border-indigo-200 px-4 py-3 text-sm font-semibold text-indigo-700 transition hover:bg-indigo-50 dark:border-indigo-900 dark:text-indigo-300 dark:hover:bg-indigo-950/40">
+                                                            <span aria-hidden="true">&#10003;</span> Tandai selesai
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            @elseif($booking->status === 'completed')
+                                                <div class="mt-4 flex items-center gap-2 rounded-lg bg-indigo-50 px-4 py-3 text-sm font-semibold text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-300">
+                                                    <span aria-hidden="true">&#10003;</span> Pesanan selesai.
+                                                </div>
+                                            @elseif($booking->status === 'cancelled')
+                                                <div class="mt-4 flex items-center gap-2 rounded-lg bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-500 dark:bg-gray-800/60 dark:text-gray-400">
+                                                    <span aria-hidden="true">&#10005;</span> Pesanan dibatalkan.
                                                 </div>
                                             @elseif($booking->status === 'pending')
                                                 <div class="mt-4 flex items-center gap-2 rounded-lg bg-gray-50 px-4 py-3 text-sm font-semibold text-gray-500 dark:bg-gray-800/60 dark:text-gray-400">

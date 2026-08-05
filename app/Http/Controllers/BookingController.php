@@ -84,7 +84,8 @@ class BookingController extends Controller
     }
 
     /**
-     * Show booking detail.
+     * Show booking detail. Only the renter may access their own booking detail.
+     * Owner accesses incoming bookings through the owner workspace, not this route.
      */
     public function show(Booking $booking)
     {
@@ -95,6 +96,32 @@ class BookingController extends Controller
         $booking->load(['schedule.field.owner', 'schedule.field.photos', 'payment']);
 
         return view('bookings.show', compact('booking'));
+    }
+
+    /**
+     * Renter: cancel their own booking while still pending.
+     */
+    public function cancel(Booking $booking)
+    {
+        if ($booking->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        if ($booking->status !== 'pending') {
+            return back()->withErrors(['booking' => 'Pesanan yang sudah dibayar atau selesai tidak dapat dibatalkan.']);
+        }
+
+        $booking->update(['status' => 'cancelled']);
+
+        Notification::create([
+            'user_id' => $booking->schedule->field->owner->user_id,
+            'title' => 'Pesanan Dibatalkan',
+            'message' => 'Pesanan untuk lapangan ' . $booking->schedule->field->field_name . ' pada ' . $booking->booking_date->format('d M Y') . ' dibatalkan oleh penyewa.',
+            'type' => 'booking',
+            'is_read' => false,
+        ]);
+
+        return redirect()->route('bookings.index')->with('status', 'Pesanan berhasil dibatalkan.');
     }
 
     /**
@@ -146,5 +173,32 @@ class BookingController extends Controller
         ]);
 
         return redirect()->route('owner.bookings')->with('status', 'Booking berhasil dikonfirmasi!');
+    }
+
+    /**
+     * Owner: mark a paid booking as completed after the play date.
+     */
+    public function complete(Booking $booking)
+    {
+        $owner = auth()->user()->owner;
+        if (!$owner || $booking->schedule->field->owner_id !== $owner->id) {
+            abort(403);
+        }
+
+        if ($booking->status !== 'paid') {
+            return back()->withErrors(['booking' => 'Hanya pesanan yang sudah dibayar yang dapat ditandai selesai.']);
+        }
+
+        $booking->update(['status' => 'completed']);
+
+        Notification::create([
+            'user_id' => $booking->user_id,
+            'title' => 'Pesanan Selesai',
+            'message' => 'Pesanan lapangan ' . $booking->schedule->field->field_name . ' pada ' . $booking->booking_date->format('d M Y') . ' telah ditandai selesai. Terima kasih sudah berolahraga!',
+            'type' => 'booking',
+            'is_read' => false,
+        ]);
+
+        return redirect()->route('owner.bookings')->with('status', 'Pesanan ditandai selesai.');
     }
 }

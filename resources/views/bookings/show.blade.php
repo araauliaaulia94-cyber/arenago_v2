@@ -40,6 +40,7 @@
         $canPay = !$booking->payment && $booking->status === 'pending';
         $waitingConfirm = $booking->payment && $booking->payment->status === 'pending' && $booking->status === 'pending';
         $isPaid = $booking->status === 'paid';
+        $canCancel = $booking->status === 'pending';
     @endphp
 
     <x-slot name="header">
@@ -165,6 +166,18 @@
                                 <div class="mt-6 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-200">
                                     <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white">&#10003;</span>
                                     <p class="pt-0.5 font-medium">Pembayaran lunas. Pesanan siap dimainkan, selamat berolahraga!</p>
+                                </div>
+                            @endif
+
+                            @if($canCancel)
+                                <div class="mt-6 border-t border-gray-100 pt-5 dark:border-gray-700">
+                                    <form method="POST" action="{{ route('bookings.cancel', $booking) }}" onsubmit="return confirm('Batalkan pesanan ini? Tindakan tidak dapat dibatalkan.')">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-4 py-2 text-sm font-semibold text-red-600 transition hover:bg-red-50 dark:border-red-900/60 dark:hover:bg-red-950/30">
+                                            <span aria-hidden="true">&#10005;</span> Batalkan pesanan
+                                        </button>
+                                    </form>
                                 </div>
                             @endif
                         </div>
