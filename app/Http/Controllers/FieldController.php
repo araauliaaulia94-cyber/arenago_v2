@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Field;
 use App\Models\PhotoOfField;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 class FieldController extends Controller
@@ -133,7 +134,7 @@ class FieldController extends Controller
      */
     public function edit(Field $field)
     {
-        $this->authorize('manage', $field);
+        Gate::authorize('manage', $field);
 
         $field->load('photos');
 
@@ -145,7 +146,7 @@ class FieldController extends Controller
      */
     public function update(Request $request, Field $field)
     {
-        $this->authorize('manage', $field);
+        Gate::authorize('manage', $field);
 
         $validated = $request->validate([
             'field_name' => 'required|string|max:255',
@@ -178,7 +179,7 @@ class FieldController extends Controller
      */
     public function destroy(Field $field)
     {
-        $this->authorize('manage', $field);
+        Gate::authorize('manage', $field);
 
         // Delete associated photos from storage
         foreach ($field->photos as $photo) {
@@ -190,3 +191,4 @@ class FieldController extends Controller
         return redirect()->route('owner.fields.index')->with('status', 'Lapangan berhasil dihapus!');
     }
 }
+

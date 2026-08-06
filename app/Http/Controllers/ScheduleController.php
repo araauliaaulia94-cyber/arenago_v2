@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Field;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class ScheduleController extends Controller
 {
@@ -13,7 +14,9 @@ class ScheduleController extends Controller
      */
     public function index(Field $field)
     {
-        $this->authorize('manage', $field);
+        Gate::authorize('manage', $field);
+
+        $field->load('photos');
 
         $schedules = $field->schedules()
             ->orderByRaw("CASE day
@@ -37,7 +40,7 @@ class ScheduleController extends Controller
      */
     public function store(Request $request, Field $field)
     {
-        $this->authorize('manage', $field);
+        Gate::authorize('manage', $field);
 
         $validated = $request->validate([
             'day' => 'required|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
@@ -47,14 +50,8 @@ class ScheduleController extends Controller
 
         $overlap = $field->schedules()
             ->where('day', $validated['day'])
-            ->where(function ($query) use ($validated) {
-                $query->whereBetween('start_time', [$validated['start_time'], $validated['end_time']])
-                    ->orWhereBetween('end_time', [$validated['start_time'], $validated['end_time']])
-                    ->orWhere(function ($query) use ($validated) {
-                        $query->where('start_time', '<', $validated['start_time'])
-                            ->where('end_time', '>', $validated['end_time']);
-                    });
-            })
+            ->where('start_time', '<', $validated['end_time'])
+            ->where('end_time', '>', $validated['start_time'])
             ->exists();
 
         if ($overlap) {
@@ -71,7 +68,7 @@ class ScheduleController extends Controller
      */
     public function destroy(Field $field, Schedule $schedule)
     {
-        $this->authorize('manage', $schedule);
+        Gate::authorize('manage', $schedule);
 
         if ($schedule->field_id !== $field->id) {
             abort(404);
@@ -82,3 +79,4 @@ class ScheduleController extends Controller
         return redirect()->route('owner.schedules.index', $field)->with('status', 'Slot jadwal berhasil dihapus!');
     }
 }
+

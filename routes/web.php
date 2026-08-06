@@ -7,6 +7,7 @@ use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PhotoOfFieldController;
+use App\Http\Controllers\SparringPostController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -65,6 +66,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/bookings/{booking}/pay', [PaymentController::class, 'create'])->name('payments.create');
     Route::post('/bookings/{booking}/pay', [PaymentController::class, 'store'])->name('payments.store');
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+
+    // Sparring Matchmaking
+    Route::get('/sparring', [SparringPostController::class, 'index'])->name('sparring.index');
+    Route::get('/sparring/create', [SparringPostController::class, 'create'])->name('sparring.create');
+    Route::post('/sparring', [SparringPostController::class, 'store'])->name('sparring.store');
+    Route::get('/sparring/{sparringPost}', [SparringPostController::class, 'show'])->name('sparring.show');
 });
 
 require __DIR__.'/auth.php';

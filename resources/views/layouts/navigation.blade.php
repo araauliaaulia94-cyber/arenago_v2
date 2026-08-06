@@ -24,6 +24,10 @@
                         {{ __('Pesanan Saya') }}
                     </x-nav-link>
 
+                    <x-nav-link :href="route('sparring.create')" :active="request()->routeIs('sparring.*')">
+                        {{ __('Buat Sparring') }}
+                    </x-nav-link>
+
                     @if(Auth::user()->owner)
                         <x-nav-link :href="route('owner.fields.index')" :active="request()->routeIs('owner.*')">
                             {{ __('Dashboard Pemilik') }}
@@ -95,6 +99,10 @@
 
             <x-responsive-nav-link :href="route('bookings.index')" :active="request()->routeIs('bookings.*')">
                 {{ __('Pesanan Saya') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('sparring.create')" :active="request()->routeIs('sparring.*')">
+                {{ __('Buat Sparring') }}
             </x-responsive-nav-link>
 
             @if(Auth::user()->owner)

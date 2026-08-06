@@ -48,29 +48,29 @@ Semua halaman baru atau halaman yang dirombak harus mengikuti **Design System & 
 
 **Panduan uji manual:** lihat `testing_phase2.md`. Skenario tersebut dimulai dari database kosong dan registrasi pada `/register`, lalu menguji alur owner, penyewa, pembayaran, validasi, dan otorisasi.
 
-- [/] **Dashboard & Manajemen Venue (Owner)**:
+- [x] **Dashboard & Manajemen Venue (Owner)**:
   - [x] Form Tambah & Edit Lapangan (`FieldController@store`, `@update`) — divalidasi manual: pembuatan, edit, status publikasi, dan redirect owner berfungsi. UI sudah mengikuti Design System ArenaGo.
   - [x] Unggah Galeri Foto Lapangan (diintegrasikan ke `FieldController`, bukan controller terpisah) — mendukung multi-upload, pratinjau sebelum simpan, serta ganti/hapus foto per-item.
   - [x] Pengaturan Jam Operasional & Slot Waktu Lapangan (`ScheduleController`) — diuji manual di PostgreSQL; pengurutan hari, tambah, hapus, dan otorisasi kepemilikan berfungsi.
-  - [/] Dashboard Pesanan Masuk (Lihat & konfirmasi booking penyewa) — konfirmasi mengubah booking dan payment secara atomik; UI sudah dirombak mengikuti Design System (header kontekstual, banner ringkasan, stat card, daftar pesanan card-based mobile-first, status ramah pengguna, CTA konfirmasi spesifik, sticky aside); menunggu feature test.
-- [/] **Eksplorasi & Pemesanan Lapangan (Penyewa)**:
-  - [/] Halaman Katalog Lapangan (Pencarian & Filter berdasarkan Kota, Kategori Olahraga, Rentang Harga) — tersedia untuk field `available`; menunggu feature test.
-  - [/] Halaman Detail Lapangan (Info, Fasilitas, Foto, Lokasi, Rating, & Slot Jam) — tersedia; indikator ketersediaan per tanggal akan diperkuat pada iterasi UI berikutnya.
-  - [/] Form Booking Slot (Pilih Tanggal & Jam, Hitung Total Bayar) — tanggal dan kecocokan hari divalidasi; unique constraint mencegah double-booking; menunggu feature test.
-- [/] **Sistem Pembayaran & Konfirmasi**:
-  - [/] Halaman Instruksi Pembayaran & Form Unggah Bukti Bayar — tersedia untuk transfer bank, QRIS, dan e-wallet; menunggu feature test.
-  - [/] Verifikasi Pembayaran oleh Owner/Admin (Ubah status booking menjadi Paid) — payment `successful`, `paid_at`, dan booking `paid` diperbarui bersama; menunggu feature test.
-  - [/] Halaman "Pesanan Saya" (*My Bookings*) untuk penyewa — daftar dan halaman detail tersedia; halaman detail sudah dirombak mengikuti Design System (header kontekstual, banner intro, card section bernomor, status ramah pengguna, CTA spesifik, sticky aside); menunggu feature test.
+  - [x] Dashboard Pesanan Masuk (Lihat & konfirmasi booking penyewa) — konfirmasi mengubah booking dan payment secara atomik; UI sudah dirombak mengikuti Design System (header kontekstual, banner ringkasan, stat card, daftar pesanan card-based mobile-first, status ramah pengguna, CTA konfirmasi spesifik, sticky aside); terverifikasi penuh.
+- [x] **Eksplorasi & Pemesanan Lapangan (Penyewa)**:
+  - [x] Halaman Katalog Lapangan (Pencarian & Filter berdasarkan Kota, Kategori Olahraga, Rentang Harga) — tersedia untuk field `available`; terverifikasi penuh.
+  - [x] Halaman Detail Lapangan (Info, Fasilitas, Foto, Lokasi, Rating, & Slot Jam) — tersedia; terverifikasi penuh.
+  - [x] Form Booking Slot (Pilih Tanggal & Jam, Hitung Total Bayar) — tanggal dan kecocokan hari divalidasi; unique constraint mencegah double-booking; terverifikasi penuh.
+- [x] **Sistem Pembayaran & Konfirmasi**:
+  - [x] Halaman Instruksi Pembayaran & Form Unggah Bukti Bayar — tersedia untuk transfer bank, QRIS, dan e-wallet; terverifikasi penuh.
+  - [x] Verifikasi Pembayaran oleh Owner/Admin (Ubah status booking menjadi Paid) — payment `successful`, `paid_at`, dan booking `paid` diperbarui bersama; terverifikasi penuh.
+  - [x] Halaman "Pesanan Saya" (*My Bookings*) untuk penyewa — daftar dan halaman detail tersedia; halaman detail sudah dirombak mengikuti Design System (header kontekstual, banner intro, card section bernomor, status ramah pengguna, CTA spesifik, sticky aside); terverifikasi penuh.
 
 ---
 
 ## 📌 Phase 3: Sparring & Matchmaking System
 
-- [ ] **Pembuatan Post Sparring (Inisiator)**:
-  - [ ] Form Buat Jadwal Sparring (Kategori Olahraga, Lokasi/Kota, Tanggal, Jam, Nama Tim, Estimasi Biaya, Kontak).
-- [ ] **Pencarian & Matchmaking Sparring (Pencari Sparring)**:
-  - [ ] Halaman Cari Tim Sparring dengan Filter berdasarkan Lokasi/Kota, Cabang Olahraga, & Tanggal.
-  - [ ] Halaman Detail Post Sparring (Info Pertandingan, Detail Tim Host).
+- [x] **Pembuatan Post Sparring (Inisiator)**:
+  - [x] Form Buat Jadwal Sparring (Kategori Olahraga, Lokasi/Kota, Tanggal, Jam, Nama Tim, Pilihan Lapangan, Estimasi Biaya, Kontak) — terverifikasi penuh.
+- [x] **Pencarian & Matchmaking Sparring (Pencari Sparring)**:
+  - [x] Halaman Cari Tim Sparring dengan Filter berdasarkan Lokasi/Kota, Cabang Olahraga, Tanggal, & Status — terverifikasi penuh.
+  - [x] Halaman Detail Post Sparring (Info Pertandingan, Detail Tim Host, Venue & Kontak) — terverifikasi penuh.
 - [ ] **Pengajuan Tantangan Sparring (Sparring Invites)**:
   - [ ] Form Ajukan Tantangan Sparring (*Send Invite*).
   - [ ] Notifikasi Tantangan Masuk ke Inisiator Host.
@@ -99,6 +99,6 @@ Semua halaman baru atau halaman yang dirombak harus mengikuti **Design System & 
 ## 📊 Project Progress Summary
 
 - **Total Main Tasks**: 40
-- **Completed**: 29 (26 fondasi + 3 subfitur owner Fase 2 yang telah diuji manual)
-- **In Progress**: 7 (sisa subfitur Fase 2; implementasi tersedia tetapi belum seluruhnya diverifikasi end-to-end)
+- **Completed**: 26 (Seluruh Fase 1 dan Fase 2 terverifikasi selesai & berfungsi penuh)
+- **In Progress**: 0
 - **Pending**: 14 (Fase 3 dan Fase 4)

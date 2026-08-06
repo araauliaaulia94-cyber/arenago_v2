@@ -13,6 +13,7 @@ class SchedulePolicy
     public function manage(User $user, Schedule $schedule): bool
     {
         return $user->owner !== null
+            && $schedule->field !== null
             && $schedule->field->owner_id === $user->owner->id;
     }
 }

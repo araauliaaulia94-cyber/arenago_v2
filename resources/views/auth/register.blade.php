@@ -16,14 +16,6 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
-        <!-- WhatsApp Number -->
-        <div class="mt-4">
-            <x-input-label for="whatsapp" :value="__('Nomor WhatsApp')" />
-            <x-text-input id="whatsapp" class="block mt-1 w-full" type="tel" name="whatsapp" :value="old('whatsapp')" required autocomplete="tel" placeholder="081234567890" />
-            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Format: 08 diikuti 8&ndash;13 digit. Dipakai untuk konfirmasi pesanan.</p>
-            <x-input-error :messages="$errors->get('whatsapp')" class="mt-2" />
-        </div>
-
         <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
