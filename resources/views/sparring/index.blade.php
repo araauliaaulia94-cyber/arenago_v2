@@ -117,8 +117,15 @@
                                             <span class="rounded-full bg-indigo-100 px-3 py-1 text-xs font-bold text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 uppercase">
                                                 {{ $post->sport_category }}
                                             </span>
-                                            <span class="rounded-full px-2.5 py-0.5 text-xs font-bold uppercase {{ $post->status === 'open' ? 'bg-emerald-500/15 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-500/30' }}">
-                                                {{ $post->status === 'open' ? 'OPEN' : 'MATCHED' }}
+                                            @php
+                                                $statusBadge = match ($post->status) {
+                                                    'full' => ['PENUH', 'bg-rose-500/15 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-500/30'],
+                                                    'matched' => ['MATCHED', 'bg-amber-500/15 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-500/30'],
+                                                    default => ['OPEN', 'bg-emerald-500/15 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-500/30'],
+                                                };
+                                            @endphp
+                                            <span class="rounded-full px-2.5 py-0.5 text-xs font-bold uppercase {{ $statusBadge[1] }}">
+                                                {{ $statusBadge[0] }}
                                             </span>
                                         </div>
 
@@ -147,6 +154,10 @@
                                             <div class="flex justify-between">
                                                 <span class="text-gray-500 dark:text-gray-400">⏰ Jam:</span>
                                                 <span class="font-bold text-gray-900 dark:text-white">{{ substr($post->start_time, 0, 5) }} – {{ substr($post->end_time, 0, 5) }}</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span class="text-gray-500 dark:text-gray-400">👥 Anggota:</span>
+                                                <span class="font-bold text-gray-900 dark:text-white">{{ $post->members_count ?? 0 }} / {{ $post->max_players }}</span>
                                             </div>
                                             @if($post->cost)
                                                 <div class="flex justify-between border-t border-gray-100 dark:border-gray-700 pt-2">

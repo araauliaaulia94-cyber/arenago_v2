@@ -52,9 +52,15 @@ Semua halaman baru atau halaman yang dirombak harus mengikuti **Design System & 
   - [x] Form Tambah & Edit Lapangan (`FieldController@store`, `@update`) — divalidasi manual: pembuatan, edit, status publikasi, dan redirect owner berfungsi. UI sudah mengikuti Design System ArenaGo.
   - [x] Unggah Galeri Foto Lapangan (diintegrasikan ke `FieldController`, bukan controller terpisah) — mendukung multi-upload, pratinjau sebelum simpan, serta ganti/hapus foto per-item.
   - [x] Pengaturan Jam Operasional & Slot Waktu Lapangan (`ScheduleController`) — diuji manual di PostgreSQL; pengurutan hari, tambah, hapus, dan otorisasi kepemilikan berfungsi.
-  - [x] Dashboard Pesanan Masuk (Lihat & konfirmasi booking penyewa) — konfirmasi mengubah booking dan payment secara atomik; UI sudah dirombak mengikuti Design System (header kontekstual, banner ringkasan, stat card, daftar pesanan card-based mobile-first, status ramah pengguna, CTA konfirmasi spesifik, sticky aside); terverifikasi penuh.
+  - [x] Dashboard Pemilik (Kelola venue: ringkasan lapangan, slot jadwal, & kartu Pesanan Masuk) — seksi **Kelola venue** menjadi fokus utama dashboard; halaman **Pesanan Masuk** (`/owner/bookings`) hanya diakses dari dashboard (bukan dari navbar); dashboard menampilkan kartu *Lapangan saya*, *Slot jadwal*, dan *Pesanan masuk* yang membuka halaman khusus saat diklik; UI mengikuti Design System (header kontekstual, banner ringkasan, stat card, card-based mobile-first, CTA spesifik).
+- [x] Halaman Pesanan Masuk Owner (Lihat & konfirmasi booking penyewa pada halaman khusus `/owner/bookings`) — konfirmasi mengubah booking dan payment secara atomik; UI mengikuti Design System (header kontekstual, banner ringkasan, stat card, daftar pesanan card-based mobile-first, status ramah pengguna, CTA konfirmasi spesifik, sticky aside); terverifikasi penuh.
 - [x] **Eksplorasi & Pemesanan Lapangan (Penyewa)**:
   - [x] Halaman Katalog Lapangan (Pencarian & Filter berdasarkan Kota, Kategori Olahraga, Rentang Harga) — tersedia untuk field `available`; terverifikasi penuh.
+  - [x] Penyelarasan hero Katalog Lapangan — satu section mobile-first dengan palet indigo/lime ArenaGo, ikon olahraga di sisi kanan desktop, dan filter tetap sebagai card terpisah.
+  - [x] Animasi ikon bola hero Katalog Lapangan — gerak mengambang lembut dan lambat, dengan dukungan pengurangan gerakan sistem.
+  - [x] Pembaruan copy hero Katalog Lapangan — headline eksplorasi, highlight lime, dan deskripsi booking diselaraskan dengan visual Dashboard ArenaGo.
+  - [x] Redesign hero Katalog Lapangan menjadi full-viewport — layout 2 kolom desktop (teks kiri + bola kanan), badge, judul, deskripsi utama & pendukung, statistik (500+ Venue, 10.000+ Pengguna, 4.9/5 Rating), background gradient dark purple, responsive mobile 1 kolom dengan bola diperkecil, "Lapangan Tersedia" berada di bawah fold.
+  - [x] Hero landing page ArenaGo — hero sports-tech desktop dengan CTA eksplorasi lapangan, statistik mitra, dan palet indigo/lime yang konsisten dengan Dashboard.
   - [x] Halaman Detail Lapangan (Info, Fasilitas, Foto, Lokasi, Rating, & Slot Jam) — tersedia; terverifikasi penuh.
   - [x] Form Booking Slot (Pilih Tanggal & Jam, Hitung Total Bayar) — tanggal dan kecocokan hari divalidasi; unique constraint mencegah double-booking; terverifikasi penuh.
 - [x] **Sistem Pembayaran & Konfirmasi**:
@@ -71,9 +77,9 @@ Semua halaman baru atau halaman yang dirombak harus mengikuti **Design System & 
 - [x] **Pencarian & Matchmaking Sparring (Pencari Sparring)**:
   - [x] Halaman Cari Tim Sparring dengan Filter berdasarkan Lokasi/Kota, Cabang Olahraga, Tanggal, & Status — terverifikasi penuh.
   - [x] Halaman Detail Post Sparring (Info Pertandingan, Detail Tim Host, Venue & Kontak) — terverifikasi penuh.
-- [ ] **Pengajuan Tantangan Sparring (Sparring Invites)**:
-  - [ ] Form Ajukan Tantangan Sparring (*Send Invite*).
-  - [ ] Notifikasi Tantangan Masuk ke Inisiator Host.
+- [x] **Pengajuan Tantangan Sparring (Sparring Invites)**:
+  - [x] Form Ajukan Tantangan Sparring (*Send Invite*).
+  - [x] Notifikasi Tantangan Masuk ke Inisiator Host.
   - [ ] Aksi Terima (*Accept*) / Tolak (*Reject*) Tantangan oleh Host.
   - [ ] Pembaruan Status Post Sparring menjadi `MATCHED`.
 - [ ] **Partisipasi Anggota Sparring**:

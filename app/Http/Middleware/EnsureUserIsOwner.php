@@ -16,7 +16,7 @@ class EnsureUserIsOwner
     {
         $user = $request->user();
 
-        if (!$user || !$user->owner) {
+        if (!$user || !$user->isOwner()) {
             return redirect()->route('owner.register')
                 ->with('status', 'Silakan daftar sebagai pemilik lapangan terlebih dahulu.');
         }

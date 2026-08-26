@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Field;
 use App\Models\SparringPost;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SparringPostController extends Controller
 {
@@ -13,7 +14,8 @@ class SparringPostController extends Controller
      */
     public function index(Request $request)
     {
-        $query = SparringPost::with(['user', 'field', 'invites']);
+        $query = SparringPost::with(['user', 'field', 'invites'])
+            ->withCount(['acceptedMembers as members_count']);
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
@@ -75,22 +77,40 @@ class SparringPostController extends Controller
             'field_id' => 'nullable|exists:fields,id',
             'cost' => 'nullable|string|max:255',
             'contact' => 'required|string|max:255',
+            'max_players' => 'required|integer|min:2|max:99',
         ]);
 
-        $sparringPost = SparringPost::create([
-            'user_id' => auth()->id(),
-            'title' => $validated['title'],
-            'sport_category' => $validated['sport_category'],
-            'location' => $validated['location'],
-            'event_date' => $validated['event_date'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-            'team_name' => $validated['team_name'],
-            'field_id' => $validated['field_id'] ?? null,
-            'cost' => $validated['cost'] ?? null,
-            'contact' => $validated['contact'],
-            'status' => 'open',
-        ]);
+        $sparringPost = DB::transaction(function () use ($validated) {
+            $sparringPost = SparringPost::create([
+                'user_id' => auth()->id(),
+                'title' => $validated['title'],
+                'sport_category' => $validated['sport_category'],
+                'location' => $validated['location'],
+                'event_date' => $validated['event_date'],
+                'start_time' => $validated['start_time'],
+                'end_time' => $validated['end_time'],
+                'team_name' => $validated['team_name'],
+                'field_id' => $validated['field_id'] ?? null,
+                'cost' => $validated['cost'] ?? null,
+                'contact' => $validated['contact'],
+                'max_players' => (int) $validated['max_players'],
+                'status' => 'open',
+            ]);
+
+            // Pembuat posting otomatis menjadi anggota pertama.
+            $sparringPost->members()->create([
+                'user_id' => auth()->id(),
+                'status' => 'accepted',
+                'joined_at' => now(),
+            ]);
+
+            // Saat kuota sudah terisi, status post menjadi 'full' (penuh).
+            if ($sparringPost->isFull()) {
+                $sparringPost->update(['status' => 'full']);
+            }
+
+            return $sparringPost;
+        });
 
         return redirect()->route('sparring.index')->with('status', 'Jadwal sparring berhasil dipublikasikan!');
     }
@@ -101,6 +121,7 @@ class SparringPostController extends Controller
     public function show(SparringPost $sparringPost)
     {
         $sparringPost->load(['user', 'field', 'invites.sender']);
+        $sparringPost->loadCount('acceptedMembers as members_count');
 
         return view('sparring.show', compact('sparringPost'));
     }

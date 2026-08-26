@@ -12,7 +12,7 @@ class FieldPolicy
      */
     public function manage(User $user, Field $field): bool
     {
-        return $user->owner !== null
+        return $user->isOwner()
             && $field->owner_id === $user->owner->id;
     }
 }

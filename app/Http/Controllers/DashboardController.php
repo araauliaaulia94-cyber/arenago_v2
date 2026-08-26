@@ -14,27 +14,7 @@ class DashboardController extends Controller
     public function __invoke(Request $request): View
     {
         $user = $request->user();
-        $isOwner = $user->owner !== null;
-
-        if ($isOwner) {
-            $owner = $user->owner;
-
-            $incomingBookings = Booking::whereHas('schedule.field', function ($query) use ($owner) {
-                $query->where('owner_id', $owner->id);
-            })->with('payment')->latest()->get();
-
-            $fieldsCount = $owner->fields()->count();
-            $needsAction = $incomingBookings->filter(fn ($booking) => $booking->status === 'pending' && $booking->payment)->count();
-            $paidCount = $incomingBookings->where('status', 'paid')->count();
-
-            return view('dashboard', [
-                'user' => $user,
-                'isOwner' => true,
-                'fieldsCount' => $fieldsCount,
-                'needsAction' => $needsAction,
-                'paidCount' => $paidCount,
-            ]);
-        }
+        $isOwner = $user->isOwner();
 
         $bookings = $user->bookings()->with('payment')->latest()->get();
 
@@ -44,7 +24,7 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'user' => $user,
-            'isOwner' => false,
+            'isOwner' => $isOwner,
             'totalBookings' => $totalBookings,
             'needsPayment' => $needsPayment,
             'paidBookings' => $paidBookings,

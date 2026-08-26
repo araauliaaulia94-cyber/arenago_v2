@@ -5,3 +5,22 @@
 [x-cloak] {
     display: none !important;
 }
+
+/* Smooth scroll for anchor links */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Hero ball floating animation */
+.hero-ball {
+    display: inline-block;
+    animation: heroBallFloat 9s ease-in-out infinite;
+    will-change: transform;
+}
+@keyframes heroBallFloat {
+    0%, 100% { transform: translateY(0) rotate(-4deg); }
+    50% { transform: translateY(-12px) rotate(4deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .hero-ball { animation: none; }
+}

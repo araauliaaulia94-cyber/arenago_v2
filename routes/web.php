@@ -1,17 +1,25 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OwnerDashboardController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FieldController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PhotoOfFieldController;
+use App\Http\Controllers\SparringInviteController;
 use App\Http\Controllers\SparringPostController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    $fields = \App\Models\Field::where('status', 'available')
+        ->with(['photos', 'reviews'])
+        ->latest()
+        ->take(3)
+        ->get();
+
+    return view('welcome', compact('fields'));
 });
 
 Route::get('/dashboard', DashboardController::class)
@@ -49,7 +57,14 @@ Route::middleware('auth')->group(function () {
         Route::post('/owner/fields/{field}/schedules', [ScheduleController::class, 'store'])->name('owner.schedules.store');
         Route::delete('/owner/fields/{field}/schedules/{schedule}', [ScheduleController::class, 'destroy'])->name('owner.schedules.destroy');
 
-        // Owner: Incoming Bookings
+        // Owner: Dashboard (ringkasan venue)
+        Route::get('/owner/dashboard', OwnerDashboardController::class)->name('owner.dashboard');
+
+        // Owner: Profil Bisnis
+        Route::get('/owner/profile', [\App\Http\Controllers\OwnerController::class, 'edit'])->name('owner.profile.edit');
+        Route::put('/owner/profile', [\App\Http\Controllers\OwnerController::class, 'update'])->name('owner.profile.update');
+
+        // Owner: Pesanan masuk (dedicated page)
         Route::get('/owner/bookings', [BookingController::class, 'ownerBookings'])->name('owner.bookings');
         Route::patch('/owner/bookings/{booking}/confirm', [BookingController::class, 'confirm'])->name('owner.bookings.confirm');
         Route::patch('/owner/bookings/{booking}/complete', [BookingController::class, 'complete'])->name('owner.bookings.complete');
@@ -72,6 +87,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/sparring/create', [SparringPostController::class, 'create'])->name('sparring.create');
     Route::post('/sparring', [SparringPostController::class, 'store'])->name('sparring.store');
     Route::get('/sparring/{sparringPost}', [SparringPostController::class, 'show'])->name('sparring.show');
+    Route::post('/sparring/{sparringPost}/invite', [SparringInviteController::class, 'store'])->name('sparring.invites.store');
 });
 
 require __DIR__.'/auth.php';

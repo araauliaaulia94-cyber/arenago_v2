@@ -28,7 +28,7 @@ class BookingPolicy
      */
     public function manageAsOwner(User $user, Booking $booking): bool
     {
-        return $user->owner !== null
+        return $user->isOwner()
             && $booking->schedule->field->owner_id === $user->owner->id;
     }
 }

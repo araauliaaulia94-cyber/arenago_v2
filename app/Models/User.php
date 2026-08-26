@@ -35,6 +35,14 @@ class User extends Authenticatable
         return $this->hasOne(Owner::class);
     }
 
+    /**
+     * Memeriksa apakah pengguna terdaftar sebagai pemilik lapangan (Venue Owner).
+     */
+    public function isOwner(): bool
+    {
+        return $this->owner !== null;
+    }
+
     public function bookings()
     {
         return $this->hasMany(Booking::class);

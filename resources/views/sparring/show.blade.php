@@ -29,8 +29,15 @@
                                 <span class="rounded-full bg-indigo-100 px-3.5 py-1 text-xs font-bold text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200 uppercase">
                                     {{ $sparringPost->sport_category }}
                                 </span>
-                                <span class="rounded-full px-3 py-1 text-xs font-bold uppercase {{ $sparringPost->status === 'open' ? 'bg-emerald-500/15 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-500/30' }}">
-                                    {{ $sparringPost->status === 'open' ? 'OPEN' : 'MATCHED' }}
+                                @php
+                                    $statusBadge = match ($sparringPost->status) {
+                                        'full' => ['PENUH', 'bg-rose-500/15 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-500/30'],
+                                        'matched' => ['MATCHED', 'bg-amber-500/15 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-500/30'],
+                                        default => ['OPEN', 'bg-emerald-500/15 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-500/30'],
+                                    };
+                                @endphp
+                                <span class="rounded-full px-3 py-1 text-xs font-bold uppercase {{ $statusBadge[1] }}">
+                                    {{ $statusBadge[0] }}
                                 </span>
                             </div>
                             <h1 class="mt-4 text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">
@@ -60,6 +67,10 @@
                                     <p class="text-xs font-semibold text-gray-500 dark:text-gray-400">💰 Estimasi Biaya / Patungan</p>
                                     <p class="mt-1 font-bold text-emerald-600 dark:text-emerald-400 text-sm">{{ $sparringPost->cost ?? 'Gratis / Negotiable' }}</p>
                                 </div>
+                                <div class="rounded-xl border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-900/50">
+                                    <p class="text-xs font-semibold text-gray-500 dark:text-gray-400">👥 Jumlah Anggota Tim</p>
+                                    <p class="mt-1 font-bold text-gray-900 dark:text-white text-sm">{{ $sparringPost->members_count ?? 0 }} / {{ $sparringPost->max_players }}</p>
+                                </div>
                             </div>
 
                             @if($sparringPost->field)
@@ -78,6 +89,51 @@
                             @endif
                         </div>
                     </section>
+
+                    <!-- Ajukan Sparring (Sparring Invite) -->
+                    @if($sparringPost->user_id === auth()->id())
+                        <div class="rounded-2xl border border-indigo-100 bg-indigo-50/50 p-5 dark:border-indigo-900/50 dark:bg-indigo-950/30">
+                            <p class="text-sm font-semibold text-indigo-700 dark:text-indigo-300">⚔️ Ini adalah postingan milik Anda.</p>
+                            <p class="mt-1 text-xs text-gray-600 dark:text-gray-400">Anda tidak dapat mengirim tantangan ke postingan sendiri. Kunjungi postingan tim lain untuk mengajukan sparring.</p>
+                        </div>
+                    @elseif(! in_array($sparringPost->status, ['open', 'full']))
+                        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                            <p class="text-sm font-semibold text-gray-900 dark:text-white">Postingan ini tidak menerima tantangan baru.</p>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Status saat ini: <span class="font-bold uppercase">{{ $statusBadge[0] }}</span>. Silakan cari postingan sparring lain yang masih open.</p>
+                        </div>
+                    @else
+                        <section class="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-200 dark:bg-gray-800 dark:ring-gray-700">
+                            <div class="border-b border-gray-100 px-6 py-5 dark:border-gray-700 sm:px-8">
+                                <div class="flex items-center gap-3">
+                                    <span class="flex h-8 w-8 items-center justify-center rounded-full bg-indigo-100 text-sm font-bold text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200">⚔️</span>
+                                    <div>
+                                        <h3 class="font-bold text-gray-900 dark:text-white">Ajukan tantangan sparring</h3>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">Kirim ajakan bertanding ke tim {{ $sparringPost->team_name }}.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <form method="POST" action="{{ route('sparring.invites.store', $sparringPost) }}" class="space-y-5 p-6 sm:p-8">
+                                @csrf
+
+                                <div>
+                                    <x-input-label for="team_name" :value="__('Nama tim Anda')" class="font-semibold" />
+                                    <x-text-input id="team_name" class="mt-2 block w-full" type="text" name="team_name" :value="old('team_name')" placeholder="Contoh: FC Garuda Jakarta" required autofocus />
+                                    <x-input-error :messages="$errors->get('team_name')" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="message" :value="__('Pesan tantangan (opsional)')" class="font-semibold" />
+                                    <textarea id="message" name="message" rows="4" class="mt-2 block w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-200" placeholder="Contoh: Kami tim dari komunitas Garuda, tertarik main fun match minggu ini. Bisa?">{{ old('message') }}</textarea>
+                                    <x-input-error :messages="$errors->get('message')" class="mt-2" />
+                                </div>
+
+                                <div class="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Host akan menerima pemberitahuan tantangan Anda.</p>
+                                    <x-primary-button class="justify-center rounded-lg bg-indigo-600 px-6 py-3 text-sm normal-case tracking-normal hover:bg-indigo-500">Kirim Tantangan</x-primary-button>
+                                </div>
+                            </form>
+                        </section>
+                    @endif
                 </div>
 
                 <!-- Host Contact Sidebar Card -->

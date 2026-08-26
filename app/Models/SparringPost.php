@@ -22,6 +22,7 @@ class SparringPost extends Model
         'cost',
         'contact',
         'status',
+        'max_players',
     ];
 
     protected function casts(): array
@@ -49,6 +50,21 @@ class SparringPost extends Model
     public function members()
     {
         return $this->hasMany(SparringMember::class);
+    }
+
+    public function acceptedMembers()
+    {
+        return $this->members()->where('status', 'accepted');
+    }
+
+    public function currentMemberCount()
+    {
+        return $this->acceptedMembers()->count();
+    }
+
+    public function isFull()
+    {
+        return (int) $this->max_players > 0 && $this->currentMemberCount() >= (int) $this->max_players;
     }
 
     public function invites()

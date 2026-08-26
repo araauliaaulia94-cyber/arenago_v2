@@ -50,8 +50,8 @@
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-400">Owner workspace</p>
                 <h2 class="mt-1 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">Pesanan masuk</h2>
             </div>
-            <a href="{{ route('owner.fields.index') }}" class="hidden items-center gap-2 text-sm font-semibold text-gray-600 transition hover:text-indigo-600 dark:text-gray-300 sm:inline-flex">
-                <span aria-hidden="true">&larr;</span> Kembali ke lapangan saya
+            <a href="{{ route('owner.dashboard') }}" class="hidden items-center gap-2 text-sm font-semibold text-gray-600 transition hover:text-indigo-600 dark:text-gray-300 sm:inline-flex">
+                <span aria-hidden="true">&larr;</span> Kembali ke dashboard pemilik
             </a>
         </div>
     </x-slot>

@@ -109,7 +109,7 @@ Hasil yang diharapkan:
 ## 5. Konfirmasi oleh owner
 
 1. Logout dari penyewa dan login kembali sebagai **Budi Owner**.
-2. Buka `/owner/bookings`.
+2. Buka `/owner/bookings` (halaman Pesanan Masuk Pemilik).
 3. Pastikan booking Rina dan tautan **Lihat** bukti pembayaran terlihat.
 4. Klik **Konfirmasi**.
 
@@ -122,7 +122,7 @@ Hasil yang diharapkan:
 
 ## 6. Uji otorisasi dasar
 
-1. Login sebagai penyewa dan coba buka `/owner/fields` atau `/owner/bookings`.
+1. Login sebagai penyewa dan coba buka `/owner/fields`, `/owner/dashboard`, atau `/owner/bookings`.
 2. Login sebagai owner dan coba akses URL detail booking milik penyewa jika ID booking diketahui.
 
 Hasil yang diharapkan:

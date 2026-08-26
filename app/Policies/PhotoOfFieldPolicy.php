@@ -12,7 +12,7 @@ class PhotoOfFieldPolicy
      */
     public function manage(User $user, PhotoOfField $photoOfField): bool
     {
-        return $user->owner !== null
+        return $user->isOwner()
             && $photoOfField->field->owner_id === $user->owner->id;
     }
 }

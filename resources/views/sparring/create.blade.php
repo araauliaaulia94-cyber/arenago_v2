@@ -20,6 +20,7 @@
             startTime: @js(old('start_time', '')),
             endTime: @js(old('end_time', '')),
             teamName: @js(old('team_name', '')),
+            maxPlayers: @js(old('max_players', 10)),
             cost: @js(old('cost', '')),
             contact: @js(old('contact', ''))
         }">
@@ -75,6 +76,13 @@
                                     <x-input-label for="team_name" :value="__('Nama tim / komunitas')" class="font-semibold" />
                                     <x-text-input id="team_name" class="mt-2 block w-full" type="text" name="team_name" x-model="teamName" placeholder="Contoh: FC Garuda Jakarta" required />
                                     <x-input-error :messages="$errors->get('team_name')" class="mt-2" />
+                                </div>
+
+                                <div>
+                                    <x-input-label for="max_players" :value="__('Jumlah maksimal anggota')" class="font-semibold" />
+                                    <x-text-input id="max_players" class="mt-2 block w-full" type="number" name="max_players" min="2" max="99" x-model="maxPlayers" placeholder="Contoh: 10" required />
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Kuota tim, termasuk Anda sebagai pembuat (anggota pertama).</p>
+                                    <x-input-error :messages="$errors->get('max_players')" class="mt-2" />
                                 </div>
                             </div>
                         </section>
@@ -200,6 +208,10 @@
                                     <div class="flex justify-between">
                                         <span class="text-indigo-300">Kontak:</span>
                                         <span class="font-bold text-white" x-text="contact || '-'"></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-indigo-300">👥 Anggota:</span>
+                                        <span class="font-bold text-lime-300" x-text="'1 / ' + (maxPlayers || 10)"></span>
                                     </div>
                                 </div>
                                 <div class="flex justify-between items-center pt-2">
